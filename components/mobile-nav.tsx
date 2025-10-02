@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, Users, Calendar, BarChart3, CalendarDays } from "lucide-react"
+import { Home, Users, Calendar, CalendarDays, GraduationCap } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export function MobileNav() {
@@ -13,7 +13,7 @@ export function MobileNav() {
     { href: "/dashboard/attendance", label: "Attendance", icon: Calendar },
     { href: "/dashboard", label: "Home", icon: Home },
     { href: "/dashboard/students", label: "Students", icon: Users },
-    { href: "/dashboard/reports", label: "Analyze", icon: BarChart3 },
+    { href: "/dashboard/exams", label: "Exams", icon: GraduationCap },
   ]
 
   return (

@@ -10,6 +10,8 @@ import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
 
 interface StudentFormProps {
   student?: Student
@@ -18,6 +20,17 @@ interface StudentFormProps {
 export function StudentForm({ student }: StudentFormProps) {
   const [name, setName] = useState(student?.name || "")
   const [studentId, setStudentId] = useState(student?.student_id || "")
+  const [dateOfBirth, setDateOfBirth] = useState(student?.date_of_birth || "")
+  const [gender, setGender] = useState(student?.gender || "")
+  const [bloodGroup, setBloodGroup] = useState(student?.blood_group || "")
+  const [address, setAddress] = useState(student?.address || "")
+  const [guardianName, setGuardianName] = useState(student?.guardian_name || "")
+  const [guardianContact, setGuardianContact] = useState(student?.guardian_contact || "")
+  const [guardianEmail, setGuardianEmail] = useState(student?.guardian_email || "")
+  const [emergencyContact, setEmergencyContact] = useState(student?.emergency_contact || "")
+  const [classGrade, setClassGrade] = useState(student?.class_grade || "")
+  const [section, setSection] = useState(student?.section || "")
+  const [rollNumber, setRollNumber] = useState(student?.roll_number || "")
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string | null>(student?.photo_url || null)
   const [error, setError] = useState<string | null>(null)
@@ -69,26 +82,34 @@ export function StudentForm({ student }: StudentFormProps) {
         photoUrl = publicUrl
       }
 
+      const studentData = {
+        name,
+        student_id: studentId,
+        photo_url: photoUrl,
+        date_of_birth: dateOfBirth || null,
+        gender: gender || null,
+        blood_group: bloodGroup || null,
+        address: address || null,
+        guardian_name: guardianName || null,
+        guardian_contact: guardianContact || null,
+        guardian_email: guardianEmail || null,
+        emergency_contact: emergencyContact || null,
+        class_grade: classGrade || null,
+        section: section || null,
+        roll_number: rollNumber || null,
+        updated_at: new Date().toISOString(),
+      }
+
       if (student) {
         // Update existing student
-        const { error: updateError } = await supabase
-          .from("students")
-          .update({
-            name,
-            student_id: studentId,
-            photo_url: photoUrl,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", student.id)
+        const { error: updateError } = await supabase.from("students").update(studentData).eq("id", student.id)
 
         if (updateError) throw updateError
       } else {
         // Create new student
         const { error: insertError } = await supabase.from("students").insert({
           teacher_id: user.id,
-          name,
-          student_id: studentId,
-          photo_url: photoUrl,
+          ...studentData,
         })
 
         if (insertError) throw insertError
@@ -104,46 +125,192 @@ export function StudentForm({ student }: StudentFormProps) {
   }
 
   return (
-    <Card className="max-w-2xl">
+    <Card className="max-w-4xl">
       <CardContent className="pt-6">
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="name">Student Name</Label>
-            <Input
-              id="name"
-              type="text"
-              placeholder="John Doe"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="studentId">Student ID</Label>
-            <Input
-              id="studentId"
-              type="text"
-              placeholder="S12345"
-              required
-              value={studentId}
-              onChange={(e) => setStudentId(e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="photo">Student Photo (Optional)</Label>
-            <div className="flex items-center gap-4">
-              {photoPreview && (
-                <img
-                  src={photoPreview || "/placeholder.svg"}
-                  alt="Preview"
-                  className="h-20 w-20 rounded-full object-cover"
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Basic Information</h3>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="name">Student Name *</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="John Doe"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                 />
-              )}
-              <div className="flex-1">
-                <Input id="photo" type="file" accept="image/*" onChange={handlePhotoChange} />
-                <p className="mt-1 text-xs text-muted-foreground">Upload a photo for the student ID card</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="studentId">Student ID *</Label>
+                <Input
+                  id="studentId"
+                  type="text"
+                  placeholder="S12345"
+                  required
+                  value={studentId}
+                  onChange={(e) => setStudentId(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="dateOfBirth">Date of Birth</Label>
+                <Input
+                  id="dateOfBirth"
+                  type="date"
+                  value={dateOfBirth}
+                  onChange={(e) => setDateOfBirth(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="gender">Gender</Label>
+                <Select value={gender} onValueChange={setGender}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select gender" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Male">Male</SelectItem>
+                    <SelectItem value="Female">Female</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="bloodGroup">Blood Group</Label>
+                <Select value={bloodGroup} onValueChange={setBloodGroup}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select blood group" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="A+">A+</SelectItem>
+                    <SelectItem value="A-">A-</SelectItem>
+                    <SelectItem value="B+">B+</SelectItem>
+                    <SelectItem value="B-">B-</SelectItem>
+                    <SelectItem value="AB+">AB+</SelectItem>
+                    <SelectItem value="AB-">AB-</SelectItem>
+                    <SelectItem value="O+">O+</SelectItem>
+                    <SelectItem value="O-">O-</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="photo">Student Photo</Label>
+              <div className="flex items-center gap-4">
+                {photoPreview && (
+                  <img
+                    src={photoPreview || "/placeholder.svg"}
+                    alt="Preview"
+                    className="h-20 w-20 rounded-full object-cover"
+                  />
+                )}
+                <div className="flex-1">
+                  <Input id="photo" type="file" accept="image/*" onChange={handlePhotoChange} />
+                  <p className="mt-1 text-xs text-muted-foreground">Upload a photo for the student ID card</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="address">Address</Label>
+              <Textarea
+                id="address"
+                placeholder="Enter full address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                rows={3}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Academic Information</h3>
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="space-y-2">
+                <Label htmlFor="classGrade">Class</Label>
+                <Input
+                  id="classGrade"
+                  type="text"
+                  placeholder="e.g., 10th"
+                  value={classGrade}
+                  onChange={(e) => setClassGrade(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="section">Section</Label>
+                <Input
+                  id="section"
+                  type="text"
+                  placeholder="e.g., A"
+                  value={section}
+                  onChange={(e) => setSection(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="rollNumber">Roll Number</Label>
+                <Input
+                  id="rollNumber"
+                  type="text"
+                  placeholder="e.g., 15"
+                  value={rollNumber}
+                  onChange={(e) => setRollNumber(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Guardian Information</h3>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="guardianName">Guardian Name</Label>
+                <Input
+                  id="guardianName"
+                  type="text"
+                  placeholder="Parent/Guardian name"
+                  value={guardianName}
+                  onChange={(e) => setGuardianName(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="guardianContact">Guardian Contact</Label>
+                <Input
+                  id="guardianContact"
+                  type="tel"
+                  placeholder="+1234567890"
+                  value={guardianContact}
+                  onChange={(e) => setGuardianContact(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="guardianEmail">Guardian Email</Label>
+                <Input
+                  id="guardianEmail"
+                  type="email"
+                  placeholder="parent@example.com"
+                  value={guardianEmail}
+                  onChange={(e) => setGuardianEmail(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="emergencyContact">Emergency Contact</Label>
+                <Input
+                  id="emergencyContact"
+                  type="tel"
+                  placeholder="+1234567890"
+                  value={emergencyContact}
+                  onChange={(e) => setEmergencyContact(e.target.value)}
+                />
               </div>
             </div>
           </div>

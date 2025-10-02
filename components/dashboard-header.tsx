@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { useRouter, usePathname } from "next/navigation"
 import Link from "next/link"
-import { Users, Calendar, FileText, LogOut, LayoutDashboard, Bell, Menu } from "lucide-react"
+import { Users, Calendar, FileText, LogOut, LayoutDashboard, Bell, Menu, GraduationCap } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
 
@@ -23,6 +23,7 @@ export function DashboardHeader() {
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/dashboard/students", label: "Students", icon: Users },
     { href: "/dashboard/attendance", label: "Attendance", icon: Calendar },
+    { href: "/dashboard/exams", label: "Exams", icon: GraduationCap },
     { href: "/dashboard/reports", label: "Reports", icon: FileText },
   ]
 
