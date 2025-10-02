@@ -26,3 +26,16 @@ export interface TeacherProfile {
   created_at: string
   updated_at: string
 }
+
+export interface AttendanceSession {
+  id: string
+  teacher_id: string
+  session_name: string
+  date: string
+  start_time: string
+  end_time: string
+  qr_code_data: string
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
