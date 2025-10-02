@@ -4,26 +4,29 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Updated to vibrant, colorful theme for educational app */
+  /* Updated to sophisticated educational theme inspired by design references */
+  /* Deep blue primary inspired by professional educational platforms */
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
+
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
+
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
 
-  /* Vibrant blue-purple gradient primary */
+  /* Rich navy blue for primary actions */
   --primary: oklch(0.205 0 0);
   --primary-foreground: oklch(0.985 0 0);
 
-  /* Soft purple secondary */
+  /* Soft blue-gray for secondary elements */
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
 
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
 
-  /* Vibrant accent colors */
+  /* Vibrant accent for CTAs and highlights */
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
 
@@ -34,7 +37,7 @@
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
 
-  /* Colorful chart colors */
+  /* Educational-themed chart colors */
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -43,11 +46,18 @@
 
   --radius: 0.625rem;
 
-  /* Success and warning colors */
-  --success: oklch(0.7 0.18 140);
+  /* Additional educational theme colors */
+  --success: oklch(0.65 0.18 150);
   --warning: oklch(0.75 0.18 80);
-  --info: oklch(0.65 0.2 240);
+  --info: oklch(0.6 0.18 240);
 
+  /* Navigation specific colors */
+  --nav-background: oklch(1 0 0);
+  --nav-border: oklch(0.94 0.01 240);
+  --footer-background: oklch(0.25 0.03 250);
+  --footer-foreground: oklch(0.95 0.01 240);
+
+  /* Sidebar specific colors */
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -61,28 +71,44 @@
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
+
   --card: oklch(0.145 0 0);
   --card-foreground: oklch(0.985 0 0);
+
   --popover: oklch(0.145 0 0);
   --popover-foreground: oklch(0.985 0 0);
+
   --primary: oklch(0.985 0 0);
   --primary-foreground: oklch(0.205 0 0);
+
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
+
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
+
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
+
   --destructive: oklch(0.396 0.141 25.723);
   --destructive-foreground: oklch(0.637 0.237 25.331);
+
   --border: oklch(0.269 0 0);
   --input: oklch(0.269 0 0);
   --ring: oklch(0.439 0 0);
+
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
+
+  --nav-background: oklch(0.22 0.02 250);
+  --nav-border: oklch(0.28 0.03 250);
+  --footer-background: oklch(0.15 0.02 250);
+  --footer-foreground: oklch(0.85 0.01 240);
+
+  /* Sidebar specific colors */
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
@@ -138,67 +164,5 @@
   }
   body {
     @apply bg-background text-foreground;
-  }
-}
-
-/* Added smooth animations and transitions */
-@layer utilities {
-  .animate-fade-in {
-    animation: fadeIn 0.5s ease-in-out;
-  }
-
-  .animate-slide-up {
-    animation: slideUp 0.4s ease-out;
-  }
-
-  .animate-scale-in {
-    animation: scaleIn 0.3s ease-out;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  @keyframes slideUp {
-    from {
-      transform: translateY(20px);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-
-  @keyframes scaleIn {
-    from {
-      transform: scale(0.95);
-      opacity: 0;
-    }
-    to {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
-
-  .gradient-primary {
-    background: linear-gradient(135deg, oklch(0.6 0.25 260) 0%, oklch(0.65 0.22 280) 100%);
-  }
-
-  .gradient-success {
-    background: linear-gradient(135deg, oklch(0.7 0.18 140) 0%, oklch(0.75 0.16 160) 100%);
-  }
-
-  .gradient-warning {
-    background: linear-gradient(135deg, oklch(0.75 0.18 80) 0%, oklch(0.78 0.16 60) 100%);
-  }
-
-  .gradient-info {
-    background: linear-gradient(135deg, oklch(0.65 0.2 240) 0%, oklch(0.7 0.18 220) 100%);
   }
 }
