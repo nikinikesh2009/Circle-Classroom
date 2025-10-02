@@ -7,6 +7,10 @@ import Link from "next/link"
 import { ExamMarksTable } from "@/components/exam-marks-table"
 
 export default async function ExamDetailPage({ params }: { params: { id: string } }) {
+  if (params.id === "new") {
+    redirect("/dashboard/exams/new")
+  }
+
   const supabase = await createClient()
 
   const {
