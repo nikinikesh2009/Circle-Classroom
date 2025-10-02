@@ -10,9 +10,9 @@ export default function HomePage() {
       <section className="container px-4 py-24 md:px-6 md:py-32 lg:py-40">
         <div className="mx-auto max-w-3xl text-center">
           <div className="mb-6 inline-flex items-center rounded-full border bg-secondary px-4 py-1.5 text-sm font-medium">
-            <span className="mr-2">🎓</span>
             Welcome to the future of education
           </div>
+          {/* </CHANGE> */}
           <h1 className="mb-6 text-4xl font-bold tracking-tight text-balance sm:text-5xl md:text-6xl lg:text-7xl">
             Simplify Classroom Attendance Management
           </h1>
