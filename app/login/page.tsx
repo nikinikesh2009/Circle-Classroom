@@ -17,7 +17,9 @@ export default function LoginPage() {
   const [checkingAuth, setCheckingAuth] = useState(true)
 
   useEffect(() => {
+    console.log("[v0] Login page mounted, checking auth state...")
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      console.log("[v0] Login page auth state:", user ? "User found, redirecting" : "No user, showing login form")
       if (user) {
         router.replace("/dashboard")
       } else {
@@ -46,10 +48,13 @@ export default function LoginPage() {
     if (!validateForm()) return
 
     setLoading(true)
+    console.log("[v0] Attempting login...")
     try {
       await loginClassroom(email, password)
+      console.log("[v0] Login successful, redirecting to dashboard...")
       router.replace("/dashboard")
     } catch (err: any) {
+      console.error("[v0] Login failed:", err.message)
       setError(err.message || "Login failed. Please check your credentials.")
     } finally {
       setLoading(false)

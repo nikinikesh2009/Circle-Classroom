@@ -10,10 +10,14 @@ export default function Home() {
   const router = useRouter()
 
   useEffect(() => {
+    console.log("[v0] Home page mounted, checking auth state...")
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      console.log("[v0] Auth state changed:", user ? "User logged in" : "No user")
       if (user) {
+        console.log("[v0] Redirecting to dashboard...")
         router.replace("/dashboard")
       } else {
+        console.log("[v0] Redirecting to login...")
         router.replace("/login")
       }
     })
