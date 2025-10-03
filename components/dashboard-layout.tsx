@@ -32,6 +32,7 @@ import {
 } from "@mui/icons-material"
 import { motion, AnimatePresence } from "framer-motion"
 import { signOut } from "@/lib/auth"
+import BottomNav from "./bottom-nav"
 
 const drawerWidth = 260
 
@@ -203,7 +204,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             {children}
           </motion.div>
         </AnimatePresence>
+        <Box sx={{ height: { xs: 80, sm: 0 } }} />
       </Box>
+      <BottomNav />
     </Box>
   )
 }
