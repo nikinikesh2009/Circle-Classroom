@@ -4,8 +4,6 @@ import { getAuth } from "firebase/auth"
 import { getFirestore } from "firebase/firestore"
 import { getStorage } from "firebase/storage"
 
-console.log("[v0] Initializing Firebase...")
-
 const firebaseConfig = {
   apiKey: "AIzaSyAEapCrpDGGMiuDcZEu70T3c2AeZfVear8",
   authDomain: "circle-classroom.firebaseapp.com",
@@ -21,7 +19,5 @@ const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp()
 const auth = getAuth(app)
 const db = getFirestore(app)
 const storage = getStorage(app)
-
-console.log("[v0] Firebase initialized successfully")
 
 export { app, auth, db, storage }

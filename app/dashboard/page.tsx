@@ -28,11 +28,16 @@ export default function DashboardPage() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        router.push("/login")
+        router.replace("/login")
       } else {
-        const dashboardStats = await getDashboardStats(user.uid)
-        setStats(dashboardStats)
-        setLoading(false)
+        try {
+          const dashboardStats = await getDashboardStats(user.uid)
+          setStats(dashboardStats)
+        } catch (error) {
+          console.error("Error loading dashboard stats:", error)
+        } finally {
+          setLoading(false)
+        }
       }
     })
 
@@ -50,7 +55,7 @@ export default function DashboardPage() {
           backgroundColor: "background.default",
         }}
       >
-        <CircularProgress />
+        <CircularProgress size={40} />
       </Box>
     )
   }

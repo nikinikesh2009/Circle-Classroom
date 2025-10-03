@@ -38,14 +38,18 @@ export default function StudentsPage() {
   const [submitting, setSubmitting] = useState(false)
 
   const loadStudents = async (uid: string) => {
-    const fetchedStudents = await getStudents(uid)
-    setStudents(fetchedStudents)
+    try {
+      const fetchedStudents = await getStudents(uid)
+      setStudents(fetchedStudents)
+    } catch (error) {
+      console.error("Error loading students:", error)
+    }
   }
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        router.push("/login")
+        router.replace("/login")
       } else {
         setUserId(user.uid)
         await loadStudents(user.uid)
@@ -136,7 +140,19 @@ export default function StudentsPage() {
   ]
 
   if (loading) {
-    return null
+    return (
+      <Box
+        sx={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "background.default",
+        }}
+      >
+        <CircularProgress size={40} />
+      </Box>
+    )
   }
 
   return (
