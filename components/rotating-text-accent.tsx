@@ -1,7 +1,7 @@
 "use client"
 
 export default function RotatingTextAccent() {
-  const text = "-- Liam Explore with Jack --- "
+  const text = "-- ACO NETWORK --- "
   const chars = text.split("")
 
   return (
@@ -19,6 +19,12 @@ export default function RotatingTextAccent() {
               </textPath>
             </text>
           </svg>
+        </div>
+
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-blue-500 flex items-center justify-center">
+            <span className="text-white font-bold text-2xl md:text-3xl">A</span>
+          </div>
         </div>
       </div>
     </div>
