@@ -10,7 +10,6 @@ import {
   Assignment as AssignmentIcon,
 } from "@mui/icons-material"
 import { createBrowserClient } from "@/lib/supabase/client"
-import { getDashboardStats } from "@/lib/supabase/db"
 import DashboardLayout from "@/components/dashboard-layout"
 import StatCard from "@/components/stat-card"
 
@@ -36,8 +35,11 @@ export default function DashboardPage() {
         router.replace("/login")
       } else {
         try {
-          const dashboardStats = await getDashboardStats(user.id)
-          setStats(dashboardStats)
+          const response = await fetch("/api/dashboard/stats")
+          if (response.ok) {
+            const dashboardStats = await response.json()
+            setStats(dashboardStats)
+          }
         } catch (error) {
           console.error("Error loading dashboard stats:", error)
         } finally {
