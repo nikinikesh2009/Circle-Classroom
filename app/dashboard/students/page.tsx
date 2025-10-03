@@ -19,7 +19,6 @@ import {
 import { DataGrid, type GridColDef } from "@mui/x-data-grid"
 import { Add as AddIcon, Delete as DeleteIcon } from "@mui/icons-material"
 import { createBrowserClient } from "@/lib/supabase/client"
-import { getStudents, addStudent, deleteStudent } from "@/lib/supabase/db"
 import DashboardLayout from "@/components/dashboard-layout"
 import type { Student } from "@/lib/types"
 
@@ -36,10 +35,13 @@ export default function StudentsPage() {
   })
   const [submitting, setSubmitting] = useState(false)
 
-  const loadStudents = async (uid: string) => {
+  const loadStudents = async () => {
     try {
-      const fetchedStudents = await getStudents(uid)
-      setStudents(fetchedStudents)
+      const response = await fetch("/api/students")
+      if (response.ok) {
+        const fetchedStudents = await response.json()
+        setStudents(fetchedStudents)
+      }
     } catch (error) {
       console.error("Error loading students:", error)
     }
@@ -57,7 +59,7 @@ export default function StudentsPage() {
         router.replace("/login")
       } else {
         setUserId(user.id)
-        await loadStudents(user.id)
+        await loadStudents()
         setLoading(false)
       }
     }
@@ -84,17 +86,24 @@ export default function StudentsPage() {
 
     setSubmitting(true)
     try {
-      await addStudent(userId, {
-        name: formData.name,
-        email: formData.email,
-        grade: formData.grade,
-        attendance: 100,
-        lastActive: "Just now",
-        status: "active",
+      const response = await fetch("/api/students", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          grade: formData.grade,
+          attendance: 100,
+          lastActive: "Just now",
+          status: "active",
+        }),
       })
-      await loadStudents(userId)
-      setDialogOpen(false)
-      setFormData({ name: "", email: "", grade: "" })
+
+      if (response.ok) {
+        await loadStudents()
+        setDialogOpen(false)
+        setFormData({ name: "", email: "", grade: "" })
+      }
     } catch (error) {
       console.error("Error adding student:", error)
     } finally {
@@ -105,8 +114,13 @@ export default function StudentsPage() {
   const handleDeleteStudent = async (studentId: string) => {
     if (confirm("Are you sure you want to delete this student?")) {
       try {
-        await deleteStudent(userId, studentId)
-        await loadStudents(userId)
+        const response = await fetch(`/api/students/${studentId}`, {
+          method: "DELETE",
+        })
+
+        if (response.ok) {
+          await loadStudents()
+        }
       } catch (error) {
         console.error("Error deleting student:", error)
       }

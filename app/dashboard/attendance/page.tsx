@@ -19,7 +19,6 @@ import {
 import { DataGrid, type GridColDef } from "@mui/x-data-grid"
 import { Add as AddIcon } from "@mui/icons-material"
 import { createBrowserClient } from "@/lib/supabase/client"
-import { getAttendanceRecords, markAttendance, getAttendanceStats, getStudents } from "@/lib/supabase/db"
 import DashboardLayout from "@/components/dashboard-layout"
 import type { AttendanceRecord, Student } from "@/lib/types"
 
@@ -37,15 +36,33 @@ export default function AttendancePage() {
   })
   const [submitting, setSubmitting] = useState(false)
 
-  const loadAttendance = async (uid: string) => {
-    const today = new Date().toISOString().split("T")[0]
-    const records = await getAttendanceRecords(uid)
-    const todayStats = await getAttendanceStats(uid, today)
-    const studentsList = await getStudents(uid)
+  const loadAttendance = async () => {
+    try {
+      const today = new Date().toISOString().split("T")[0]
 
-    setAttendance(records)
-    setStats(todayStats)
-    setStudents(studentsList)
+      const [recordsRes, statsRes, studentsRes] = await Promise.all([
+        fetch("/api/attendance"),
+        fetch(`/api/attendance/stats?date=${today}`),
+        fetch("/api/students"),
+      ])
+
+      if (recordsRes.ok) {
+        const records = await recordsRes.json()
+        setAttendance(records)
+      }
+
+      if (statsRes.ok) {
+        const todayStats = await statsRes.json()
+        setStats(todayStats)
+      }
+
+      if (studentsRes.ok) {
+        const studentsList = await studentsRes.json()
+        setStudents(studentsList)
+      }
+    } catch (error) {
+      console.error("Error loading attendance:", error)
+    }
   }
 
   useEffect(() => {
@@ -60,7 +77,7 @@ export default function AttendancePage() {
         router.push("/login")
       } else {
         setUserId(user.id)
-        await loadAttendance(user.id)
+        await loadAttendance()
         setLoading(false)
       }
     }
@@ -89,16 +106,23 @@ export default function AttendancePage() {
       if (!student) return
 
       const today = new Date().toISOString().split("T")[0]
-      await markAttendance(userId, {
-        studentId: formData.studentId,
-        studentName: student.name,
-        date: today,
-        status: formData.status,
+
+      const response = await fetch("/api/attendance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          studentId: formData.studentId,
+          studentName: student.name,
+          date: today,
+          status: formData.status,
+        }),
       })
 
-      await loadAttendance(userId)
-      setDialogOpen(false)
-      setFormData({ studentId: "", status: "present" })
+      if (response.ok) {
+        await loadAttendance()
+        setDialogOpen(false)
+        setFormData({ studentId: "", status: "present" })
+      }
     } catch (error) {
       console.error("Error marking attendance:", error)
     } finally {
