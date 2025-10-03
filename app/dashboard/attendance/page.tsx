@@ -18,9 +18,8 @@ import {
 } from "@mui/material"
 import { DataGrid, type GridColDef } from "@mui/x-data-grid"
 import { Add as AddIcon } from "@mui/icons-material"
-import { onAuthStateChanged } from "firebase/auth"
-import { auth } from "@/lib/auth"
-import { getAttendanceRecords, markAttendance, getAttendanceStats, getStudents } from "@/lib/db"
+import { createBrowserClient } from "@/lib/supabase/client"
+import { getAttendanceRecords, markAttendance, getAttendanceStats, getStudents } from "@/lib/supabase/db"
 import DashboardLayout from "@/components/dashboard-layout"
 import type { AttendanceRecord, Student } from "@/lib/types"
 
@@ -50,17 +49,35 @@ export default function AttendancePage() {
   }
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const supabase = createBrowserClient()
+
+    const checkUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
       if (!user) {
         router.push("/login")
       } else {
-        setUserId(user.uid)
-        await loadAttendance(user.uid)
+        setUserId(user.id)
+        await loadAttendance(user.id)
         setLoading(false)
+      }
+    }
+
+    checkUser()
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session) {
+        router.push("/login")
       }
     })
 
-    return () => unsubscribe()
+    return () => {
+      subscription.unsubscribe()
+    }
   }, [router])
 
   const handleMarkAttendance = async () => {

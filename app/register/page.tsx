@@ -16,8 +16,8 @@ import {
 } from "@mui/material"
 import { CloudUpload as UploadIcon } from "@mui/icons-material"
 import { motion } from "framer-motion"
-import { onAuthStateChanged } from "firebase/auth"
-import { auth, registerClassroom } from "@/lib/auth"
+import { createClient } from "@/lib/supabase/client"
+import { registerClassroom } from "@/lib/supabase/auth"
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -33,12 +33,25 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const supabase = createClient()
+
+    supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) {
         router.push("/dashboard")
       }
     })
-    return () => unsubscribe()
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        router.push("/dashboard")
+      }
+    })
+
+    return () => {
+      subscription.unsubscribe()
+    }
   }, [router])
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -94,16 +107,16 @@ export default function RegisterPage() {
 
     setLoading(true)
     try {
-      await registerClassroom(
-        formData.email,
-        formData.password,
-        {
-          classroomName: formData.classroomName,
-          schoolName: formData.schoolName,
-        },
-        logoFile || undefined,
-      )
-      router.push("/dashboard")
+      const { data, error: registerError } = await registerClassroom(formData.email, formData.password, {
+        classroom_name: formData.classroomName,
+        school_name: formData.schoolName,
+      })
+
+      if (registerError) {
+        throw new Error(registerError)
+      }
+
+      router.push("/auth/sign-up-success")
     } catch (err: any) {
       setError(err.message || "Registration failed. Please try again.")
     } finally {

@@ -4,8 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Box, Typography, Card, CardContent, Grid, Button } from "@mui/material"
 import { Download as DownloadIcon } from "@mui/icons-material"
-import { onAuthStateChanged } from "firebase/auth"
-import { auth } from "@/lib/auth"
+import { createBrowserClient } from "@/lib/supabase/client"
 import DashboardLayout from "@/components/dashboard-layout"
 
 export default function ReportsPage() {
@@ -13,15 +12,33 @@ export default function ReportsPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const supabase = createBrowserClient()
+
+    const checkUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
       if (!user) {
         router.push("/login")
       } else {
         setLoading(false)
       }
+    }
+
+    checkUser()
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session) {
+        router.push("/login")
+      }
     })
 
-    return () => unsubscribe()
+    return () => {
+      subscription.unsubscribe()
+    }
   }, [router])
 
   if (loading) {

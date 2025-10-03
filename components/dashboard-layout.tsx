@@ -31,7 +31,7 @@ import {
   Logout,
 } from "@mui/icons-material"
 import { motion, AnimatePresence } from "framer-motion"
-import { signOut } from "@/lib/auth"
+import { signOut } from "@/lib/supabase/auth"
 import BottomNav from "./bottom-nav"
 
 const drawerWidth = 260

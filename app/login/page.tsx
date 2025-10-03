@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Box, TextField, Button, Typography, Card, CardContent, Alert, CircularProgress } from "@mui/material"
 import { motion } from "framer-motion"
-import { onAuthStateChanged } from "firebase/auth"
-import { auth, loginClassroom } from "@/lib/auth"
+import { createClient } from "@/lib/supabase/client"
+import { loginClassroom } from "@/lib/supabase/auth"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -18,7 +18,9 @@ export default function LoginPage() {
 
   useEffect(() => {
     console.log("[v0] Login page mounted, checking auth state...")
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const supabase = createClient()
+
+    supabase.auth.getUser().then(({ data: { user } }) => {
       console.log("[v0] Login page auth state:", user ? "User found, redirecting" : "No user, showing login form")
       if (user) {
         router.replace("/dashboard")
@@ -26,7 +28,18 @@ export default function LoginPage() {
         setCheckingAuth(false)
       }
     })
-    return () => unsubscribe()
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        router.replace("/dashboard")
+      }
+    })
+
+    return () => {
+      subscription.unsubscribe()
+    }
   }, [router])
 
   const validateForm = (): boolean => {
@@ -50,7 +63,12 @@ export default function LoginPage() {
     setLoading(true)
     console.log("[v0] Attempting login...")
     try {
-      await loginClassroom(email, password)
+      const { data, error: loginError } = await loginClassroom(email, password)
+
+      if (loginError) {
+        throw new Error(loginError)
+      }
+
       console.log("[v0] Login successful, redirecting to dashboard...")
       router.replace("/dashboard")
     } catch (err: any) {

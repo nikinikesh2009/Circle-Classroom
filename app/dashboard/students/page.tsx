@@ -18,9 +18,8 @@ import {
 } from "@mui/material"
 import { DataGrid, type GridColDef } from "@mui/x-data-grid"
 import { Add as AddIcon, Delete as DeleteIcon } from "@mui/icons-material"
-import { onAuthStateChanged } from "firebase/auth"
-import { auth } from "@/lib/auth"
-import { getStudents, addStudent, deleteStudent } from "@/lib/db"
+import { createBrowserClient } from "@/lib/supabase/client"
+import { getStudents, addStudent, deleteStudent } from "@/lib/supabase/db"
 import DashboardLayout from "@/components/dashboard-layout"
 import type { Student } from "@/lib/types"
 
@@ -47,17 +46,35 @@ export default function StudentsPage() {
   }
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const supabase = createBrowserClient()
+
+    const checkUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
       if (!user) {
         router.replace("/login")
       } else {
-        setUserId(user.uid)
-        await loadStudents(user.uid)
+        setUserId(user.id)
+        await loadStudents(user.id)
         setLoading(false)
+      }
+    }
+
+    checkUser()
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session) {
+        router.replace("/login")
       }
     })
 
-    return () => unsubscribe()
+    return () => {
+      subscription.unsubscribe()
+    }
   }, [router])
 
   const handleAddStudent = async () => {
