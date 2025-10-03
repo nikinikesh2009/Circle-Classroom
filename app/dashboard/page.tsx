@@ -11,18 +11,27 @@ import {
 } from "@mui/icons-material"
 import { onAuthStateChanged } from "firebase/auth"
 import { auth } from "@/lib/auth"
+import { getDashboardStats } from "@/lib/db"
 import DashboardLayout from "@/components/dashboard-layout"
 import StatCard from "@/components/stat-card"
 
 export default function DashboardPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
+  const [stats, setStats] = useState({
+    totalStudents: 0,
+    averageAttendance: 0,
+    activeStudents: 0,
+    recentActivity: 0,
+  })
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (!user) {
         router.push("/login")
       } else {
+        const dashboardStats = await getDashboardStats(user.uid)
+        setStats(dashboardStats)
         setLoading(false)
       }
     })
@@ -62,7 +71,7 @@ export default function DashboardPage() {
           <Grid item xs={12} sm={6} md={3}>
             <StatCard
               title="Total Students"
-              value={156}
+              value={stats.totalStudents}
               icon={<PeopleIcon sx={{ fontSize: 32 }} />}
               color="#1976d2"
               delay={0}
@@ -71,7 +80,7 @@ export default function DashboardPage() {
           <Grid item xs={12} sm={6} md={3}>
             <StatCard
               title="Avg. Attendance"
-              value="94%"
+              value={`${stats.averageAttendance}%`}
               icon={<AttendanceIcon sx={{ fontSize: 32 }} />}
               color="#4caf50"
               delay={0.1}
@@ -79,8 +88,8 @@ export default function DashboardPage() {
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
             <StatCard
-              title="Active Today"
-              value={142}
+              title="Active Students"
+              value={stats.activeStudents}
               icon={<TrendingIcon sx={{ fontSize: 32 }} />}
               color="#2196f3"
               delay={0.2}
@@ -88,8 +97,8 @@ export default function DashboardPage() {
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
             <StatCard
-              title="Pending Tasks"
-              value={12}
+              title="Recent Activity"
+              value={stats.recentActivity}
               icon={<AssignmentIcon sx={{ fontSize: 32 }} />}
               color="#ff9800"
               delay={0.3}
